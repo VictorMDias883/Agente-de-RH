@@ -11,3 +11,4 @@ pypdf
 python-docx
 passlib[bcrypt]
 python-jose
+pydantic[email]
