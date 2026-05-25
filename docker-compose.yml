@@ -18,5 +18,19 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql
+
+  backend:
+    build: .
+    container_name: hr_backend
+    restart: always
+
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/hrsystem
+    volumes:
+      - .:/app
 volumes:
   postgres_data:

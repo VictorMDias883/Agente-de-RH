@@ -1,8 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UploadCloud, Bot } from "lucide-react";
 
 export default function CandidatePage() {
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const role = localStorage.getItem("authRole");
+
+    if (!token || role !== "user") {
+      router.push("/login");
+      return;
+    }
+
+    setAuthorized(true);
+  }, [router]);
+
+  if (!authorized) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-10">
+        <div className="rounded-[32px] border border-zinc-800 bg-zinc-950 p-10 text-center">
+          <p className="text-sm text-zinc-400">Aguardando verificação de acesso...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="w-full min-h-screen bg-black text-white px-6 py-10">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_0.9fr] gap-8">
