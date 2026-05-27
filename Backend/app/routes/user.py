@@ -20,7 +20,7 @@ def register_user(
     user: UserRegister,
     db: Session = Depends(get_db)
 ):
-    UserService.userRegister(user, db)
+    return UserService.userRegister(user, db)
    
 
 @router.post("/login")
@@ -29,4 +29,4 @@ def login(
     db: Session = Depends(get_db)
 ):
 
-    UserService.userLogin(user, db)
+    return UserService.userLogin(user, db)

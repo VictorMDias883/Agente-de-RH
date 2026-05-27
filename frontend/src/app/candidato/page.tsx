@@ -3,23 +3,59 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UploadCloud, Bot } from "lucide-react";
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 export default function CandidatePage() {
   const router = useRouter();
+  
   const [authorized, setAuthorized] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [experience, setExp] = useState("");
+  const [file, setFile] = useState<File| null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null)
+  
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const storedToken = localStorage.getItem("authRole")
     const role = localStorage.getItem("authRole");
-
-    if (!token || role !== "user") {
+    if (!storedToken || role !== "user") {
       router.push("/login");
       return;
     }
-
+    
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setToken(storedToken);
     setAuthorized(true);
   }, [router]);
-
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>){
+    event.preventDefault();
+    if (!file) {
+    setMessage("Envie um currículo");
+    return;
+  }
+    const formData = new FormData();
+    formData.append("phone", phone)
+    formData.append("experience", experience)
+    formData.append("curriculum", file)
+    const endpoint = `${API_BASE_URL}/${"Process"}/register`;
+    try{
+      const response = await fetch(endpoint, {
+        method:"POST",
+        headers:{
+          "Authorization": `Bearer ${token}`,
+        },
+        body:formData
+        
+      });
+      const data = await response.json();
+      if(!response.ok){
+        throw new Error(data.detaill || "Erro ao enviar");
+      }
+      setMessage("Candidatura enviada!");
+    }catch (error) {
+      setMessage("Erro ao conectar com o servidor. Tente novamente mais tarde.");
+    } 
+  }
   if (!authorized) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-10">
@@ -52,31 +88,7 @@ export default function CandidatePage() {
           </div>
 
           {/* FORM */}
-          <form className="space-y-8">
-            {/* NAME */}
-            <div>
-              <label className="block text-sm text-zinc-400 mb-3">
-                Nome completo
-              </label>
-
-              <input
-                type="text"
-                placeholder="Digite seu nome"
-                className="w-full bg-black border border-zinc-800 rounded-2xl px-5 py-4 outline-none focus:border-white transition"
-              />
-            </div>
-
-            {/* EMAIL */}
-            <div>
-              <label className="block text-sm text-zinc-400 mb-3">Email</label>
-
-              <input
-                type="email"
-                placeholder="Digite seu email"
-                className="w-full bg-black border border-zinc-800 rounded-2xl px-5 py-4 outline-none focus:border-white transition"
-              />
-            </div>
-
+          <form className="space-y-8" onSubmit={handleSubmit}>
             {/* PHONE */}
             <div>
               <label className="block text-sm text-zinc-400 mb-3">
@@ -86,6 +98,7 @@ export default function CandidatePage() {
               <input
                 type="text"
                 placeholder="Digite seu telefone"
+                onChange={(event) => setPhone(event.target.value)}
                 className="w-full bg-black border border-zinc-800 rounded-2xl px-5 py-4 outline-none focus:border-white transition"
               />
             </div>
@@ -99,6 +112,7 @@ export default function CandidatePage() {
               <textarea
                 rows={6}
                 placeholder="Fale brevemente sobre sua experiência..."
+                onChange = {(event) => setExp(event.target.value)}
                 className="w-full resize-none bg-black border border-zinc-800 rounded-2xl px-5 py-4 outline-none focus:border-white transition"
               />
             </div>
@@ -118,7 +132,11 @@ export default function CandidatePage() {
                   Suporte para PDF, DOC e DOCX.
                 </p>
 
-                <input type="file" className="hidden" />
+                <input type="file" className="hidden" onChange = {(event) => {
+                  if(event.target.files?.[0]){
+                    setFile(event.target.files[0])
+                  }
+                }}/>
               </label>
             </div>
 

@@ -46,3 +46,4 @@ class Processos(Base):
         ForeignKey("users.id")
     ) 
     candidate = relationship("User")
+    filepath=Column(String, nullable=False)

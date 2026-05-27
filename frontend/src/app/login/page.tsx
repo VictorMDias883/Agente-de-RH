@@ -18,7 +18,7 @@ export default function LoginPage() {
     setLoading(true);
     setMessage(null);
 
-    const endpoint = `${API_BASE_URL}/${role === "admin" ? "admin" : "user"}/login`;
+    const endpoint = `${API_BASE_URL}/${role === "admin" ? "admin" : "candidate"}/login`;
 
     try {
       const response = await fetch(endpoint, {

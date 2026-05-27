@@ -13,11 +13,12 @@ from app.core.security import (
 from fastapi import HTTPException
 from app.models.models import User
 class UserService:
-    def userRegister(user:userRegister, db: Session):
+    def userRegister(user:UserRegister, db: Session):
+        print(user.password)
         existing_user = db.query(User).filter(
         User.email == user.email
         ).first()
-
+        
         if existing_user:
             raise HTTPException(
                 status_code=400,
@@ -41,7 +42,7 @@ class UserService:
         return {
         "message": "User created"
         }
-    def userLogin(user:userLogin, db:Session):
+    def userLogin(user:UserLogin, db:Session):
         db_user = db.query(User).filter(
             User.email == user.email
         ).first()
