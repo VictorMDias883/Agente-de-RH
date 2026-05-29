@@ -16,7 +16,7 @@ export default function CandidatePage() {
   
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("authRole")
+    const storedToken = localStorage.getItem("authToken")
     const role = localStorage.getItem("authRole");
     if (!storedToken || role !== "user") {
       router.push("/login");
@@ -37,7 +37,7 @@ export default function CandidatePage() {
     formData.append("phone", phone)
     formData.append("experience", experience)
     formData.append("curriculum", file)
-    const endpoint = `${API_BASE_URL}/${"Process"}/register`;
+    const endpoint = `${API_BASE_URL}/${"process"}/register`;
     try{
       const response = await fetch(endpoint, {
         method:"POST",
@@ -49,7 +49,7 @@ export default function CandidatePage() {
       });
       const data = await response.json();
       if(!response.ok){
-        throw new Error(data.detaill || "Erro ao enviar");
+        throw new Error(data.detail || "Erro ao enviar");
       }
       setMessage("Candidatura enviada!");
     }catch (error) {

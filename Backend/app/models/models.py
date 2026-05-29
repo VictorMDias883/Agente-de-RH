@@ -13,8 +13,11 @@ class Candidate(Base):
     __tablename__ = "candidatos"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True)
+    candidateId = Column(
+        Integer,
+        ForeignKey("users.id")
+    ) 
+    candidate = relationship("User")
     phone = Column(String)
     experience = Column(Text)
     resume_path= Column(String, nullable=False)
@@ -41,9 +44,5 @@ class Processos(Base):
     id=Column(Integer, primary_key=True, index=True)
     name = Column(SqlEnum(ProcessosEnum), nullable=False)
     status = Column(String, nullable=False)
-    candidateId = Column(
-        Integer,
-        ForeignKey("users.id")
-    ) 
-    candidate = relationship("User")
+    
     filepath=Column(String, nullable=False)

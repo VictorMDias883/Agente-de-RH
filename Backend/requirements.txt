@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 sqlalchemy
-psycopg[binary]
+psycopg2-binary==2.9.9
 alembic
 pydantic
 python-dotenv
@@ -9,7 +9,8 @@ python-multipart
 groq
 pypdf
 python-docx
-passlib[bcrypt]==1.7.4
-bcrypt==4.0.1
+passlib[bcrypt]
+bcrypt==4.1.3
 python-jose
 pydantic[email]
+email-validator
