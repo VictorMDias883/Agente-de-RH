@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UploadCloud, Bot } from "lucide-react";
+import Chatbot from "../../components/ui/chatbot/Chatbot";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 export default function CandidatePage() {
   const router = useRouter();
@@ -167,18 +168,9 @@ export default function CandidatePage() {
           </div>
 
           {/* CHATBOT AREA */}
-          <div className="flex-1 rounded-[28px] border border-zinc-800 bg-black p-6 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 mx-auto mb-6 flex items-center justify-center">
-                <Bot size={36} className="text-zinc-400" />
-              </div>
-
-              <h3 className="text-2xl font-semibold">Chatbot</h3>
-
-              <p className="mt-4 text-zinc-500 max-w-md">
-                Aqui você poderá integrar futuramente o fluxo de entrevista
-                automatizada, perguntas técnicas e suporte ao candidato.
-              </p>
+          <div className="flex-1 rounded-[28px] border border-zinc-800 bg-black p-6">
+            <div className="h-full">
+              <Chatbot />
             </div>
           </div>
         </div>
