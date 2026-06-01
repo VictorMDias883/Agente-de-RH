@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { UploadCloud, Bot } from "lucide-react";
+import { UploadCloud, Bot, CheckCircle2, AlertCircle, Loader2, File as FileIcon } from "lucide-react";
 import Chatbot from "../../components/ui/chatbot/Chatbot";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 export default function CandidatePage() {
@@ -13,7 +13,9 @@ export default function CandidatePage() {
   const [experience, setExp] = useState("");
   const [file, setFile] = useState<File| null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null)
+  const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
 
   useEffect(() => {
@@ -32,8 +34,11 @@ export default function CandidatePage() {
     event.preventDefault();
     if (!file) {
     setMessage("Envie um currículo");
+    setMessageType("error");
     return;
   }
+    setIsLoading(true);
+    setMessage(null);
     const formData = new FormData();
     formData.append("phone", phone)
     formData.append("experience", experience)
@@ -49,13 +54,39 @@ export default function CandidatePage() {
         
       });
       const data = await response.json();
+      
+      const candidateId = data.candidate_id;
+      
       if(!response.ok){
-        throw new Error(data.detail || "Erro ao enviar");
+        throw new Error(data.message || "Erro ao enviar");
       }
-      setMessage("Candidatura enviada!");
+      setMessage("✨ Candidatura enviada com sucesso!");
+      setMessageType("success");
+      // Reset form
+      setTimeout(() => {
+        setFile(null);
+        setPhone("");
+        setExp("");
+        setMessage(null);
+        setMessageType(null);
+      }, 2000);
+      setTimeout(async () => {
+        
+        const res = await fetch(`${API_BASE_URL}/process/status/${candidateId}`)
+        const date = await res.json()
+        const printData = JSON.parse(date?.analysis);
+        console.log(printData.status);
+        if(printData.status == "invalido"){
+          console.log("Tentou burlar o sistema né safadao?");
+        }
+      }, 5000);
+      
     }catch (error) {
-      setMessage("Erro ao conectar com o servidor. Tente novamente mais tarde.");
-    } 
+      setMessage("❌ Erro ao conectar com o servidor. Tente novamente mais tarde.");
+      setMessageType("error");
+    } finally {
+      setIsLoading(false);
+    }
   }
   if (!authorized) {
     return (
@@ -133,6 +164,13 @@ export default function CandidatePage() {
                   Suporte para PDF, DOC e DOCX.
                 </p>
 
+                {file && (
+                  <div className="mt-4 flex items-center gap-2 px-4 py-2 bg-zinc-900 rounded-lg">
+                    <FileIcon size={18} className="text-green-500" />
+                    <span className="text-sm text-green-400">{file.name}</span>
+                  </div>
+                )}
+
                 <input type="file" className="hidden" onChange = {(event) => {
                   if(event.target.files?.[0]){
                     setFile(event.target.files[0])
@@ -144,10 +182,40 @@ export default function CandidatePage() {
             {/* BUTTON */}
             <button
               type="submit"
-              className="w-full py-4 rounded-2xl bg-white text-black font-semibold hover:opacity-90 transition"
+              disabled={isLoading}
+              className={`w-full py-4 rounded-2xl font-semibold transition flex items-center justify-center gap-2 ${
+                isLoading 
+                  ? "bg-zinc-800 text-zinc-400 cursor-not-allowed" 
+                  : "bg-white text-black hover:opacity-90"
+              }`}
             >
-              Enviar candidatura
+              {isLoading ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                "Enviar candidatura"
+              )}
             </button>
+
+            {/* MESSAGE FEEDBACK */}
+            {message && (
+              <div className={`mt-4 p-4 rounded-2xl flex items-start gap-3 ${
+                messageType === "success" 
+                  ? "bg-green-950 border border-green-800" 
+                  : "bg-red-950 border border-red-800"
+              }`}>
+                {messageType === "success" ? (
+                  <CheckCircle2 size={20} className="text-green-500 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle size={20} className="text-red-500 flex-shrink-0 mt-0.5" />
+                )}
+                <p className={messageType === "success" ? "text-green-300" : "text-red-300"}>
+                  {message}
+                </p>
+              </div>
+            )}
           </form>
         </div>
 

@@ -30,22 +30,22 @@ class ProcessService:
         db = SessionLocal()
         try:
             
-            resumo = asyncio.run(Request.gerar_resumo(experience, text))
-            print(f"Resumo gerado: {resumo}")
+            resumo_str = asyncio.run(Request.gerar_resumo(experience, text))
+            
             
             candidate = db.query(Candidate).filter(
                 Candidate.id == candidate_id
             ).first()
             
             if candidate:
-                candidate.ai_analysis = resumo
+                candidate.ai_analysis = resumo_str
                 db.commit()
                 db.refresh(candidate)
-                print(f"Análise salva com sucesso para candidato {candidate_id}")
+                print(f"Análise salva com sucesso para candidato", flush=True)
             else:
-                print(f"Candidato {candidate_id} não encontrado")
+                print(f"Candidato não encontrado", flush=True)
         except Exception as e:
-            print(f"Erro ao processar currículo: {e}")
+            print(f"Erro ao processar currículo: {e}", flush=True)
             db.rollback()
         finally:
             db.close()

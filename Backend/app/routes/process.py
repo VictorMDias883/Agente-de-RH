@@ -41,8 +41,24 @@ def register(
         text["text"]
     )
     return {
+        "candidate_id":candidate.id,
         "message": "Processamento iniciado"
     }
-    
+
+@router.get("/status/{candidate_id}")
+def get_status(
+    candidate_id:int,
+    db:Session = Depends(get_db)
+):
+    candidate = db.query(Candidate).filter(Candidate.id==candidate_id).first()
+    if not candidate:
+        return {"status":"not_found"}
+    if not candidate.ai_analysis:
+        return {"status":"processing"} 
+
+    return{
+        "status":"completed",
+        "analysis":candidate.ai_analysis
+    }   
     
 
