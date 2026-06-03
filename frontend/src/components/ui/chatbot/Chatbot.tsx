@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -9,31 +10,45 @@ interface Message {
   role: "assistant" | "user";
   text: string;
 }
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const CHAT_API =API_BASE_URL+ "/chat/message";
 
-const CHAT_API = "/api/chat";
-
-const initialMessages: Message[] = [
-  {
-    id: "system",
-    role: "assistant",
-    text: "Olá! Eu sou o assistente virtual de candidatos. Pergunte sobre vagas, processo seletivo, ou envie dúvidas sobre sua candidatura.",
-  },
-];
 
 function buildMessageId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-export default function Chatbot() {
+export default function Chatbot(props: { text: string; }) {
+  const initialMessages: Message[] = [
+    {
+      id: "system",
+      role: "assistant",
+      text: props.text,
+    },
+  ];
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
+  
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  
+  useEffect(() => {
+    setMessages((current) => {
+      if (!props.text) return current;
+      const first = current[0];
+      if (first && first.id === "system") {
+        if (first.text === props.text) return current;
+        return [{ ...first, text: props.text }, ...current.slice(1)];
+      }
+      return [{ id: "system", role: "assistant", text: props.text }, ...current];
+    });
+  }, [props.text]);
 
   const sendDisabled = isLoading || inputValue.trim().length === 0;
 
@@ -60,6 +75,7 @@ export default function Chatbot() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ message: text }),
+        signal: AbortSignal.timeout(30000), // Timeout de 30 segundos
       });
 
       if (!response.ok) {
@@ -68,7 +84,7 @@ export default function Chatbot() {
       }
 
       const data = await response.json();
-      const assistantAnswer = String(data.answer || data.text || "Desculpe, não consegui responder agora.");
+      const assistantAnswer = String(data.message || data.text || "Desculpe, não consegui responder agora.");
 
       setMessages((current) => [
         ...current,
@@ -134,14 +150,14 @@ export default function Chatbot() {
       <form className="grid gap-3" onSubmit={handleSend}>
         <div className="grid gap-2">
           <label htmlFor="chat-input" className="text-sm text-zinc-400">
-            Escreva sua pergunta
+            Escreva sua Resposta
           </label>
           <textarea
             id="chat-input"
             value={inputValue}
             rows={3}
             onChange={(event) => setInputValue(event.target.value)}
-            placeholder="Por exemplo: 'Como funciona a etapa de entrevista?'"
+            placeholder="Por exemplo: 'Eu tenho essa capacidade!'"
             className="w-full resize-none rounded-3xl border border-zinc-800 bg-zinc-950 p-4 text-white outline-none focus:border-white focus:ring-0"
           />
         </div>

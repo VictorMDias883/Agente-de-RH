@@ -16,7 +16,7 @@ export default function CandidatePage() {
   const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [Analysis, setAn] = useState("");
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken")
@@ -75,9 +75,10 @@ export default function CandidatePage() {
         const res = await fetch(`${API_BASE_URL}/process/status/${candidateId}`)
         const date = await res.json()
         const printData = JSON.parse(date?.analysis);
-        console.log(printData.status);
-        if(printData.status == "invalido"){
-          console.log("Tentou burlar o sistema né safadao?");
+        setAn(printData.pergunta);
+        if(printData.status != "invalido"){
+          setMessage("✨ Seu processo foi válido e será iniciado uma entrevista no chat ao lado!");
+        setMessageType("success");
         }
       }, 5000);
       
@@ -199,7 +200,6 @@ export default function CandidatePage() {
               )}
             </button>
 
-            {/* MESSAGE FEEDBACK */}
             {message && (
               <div className={`mt-4 p-4 rounded-2xl flex items-start gap-3 ${
                 messageType === "success" 
@@ -238,7 +238,7 @@ export default function CandidatePage() {
           {/* CHATBOT AREA */}
           <div className="flex-1 rounded-[28px] border border-zinc-800 bg-black p-6">
             <div className="h-full">
-              <Chatbot />
+              <Chatbot text={Analysis}/>
             </div>
           </div>
         </div>

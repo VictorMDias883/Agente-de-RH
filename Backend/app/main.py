@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.routes.user import router as user_router
 from app.routes.admin import router as admin_router
 from app.routes.process import router as process_router
+from app.routes.chatbot import router as chatbot_router
 from app.databaseConn.connection import engine
 from app.models.models import Base
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,6 +20,7 @@ Base.metadata.create_all(
 app.include_router(user_router)
 app.include_router(admin_router)
 app.include_router(process_router)
+app.include_router(chatbot_router)
 @app.get("/")
 def root():
     return {
