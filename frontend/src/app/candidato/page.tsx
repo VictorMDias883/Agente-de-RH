@@ -79,6 +79,9 @@ export default function CandidatePage() {
         if(printData.status != "invalido"){
           setMessage("✨ Seu processo foi válido e será iniciado uma entrevista no chat ao lado!");
         setMessageType("success");
+        }else{
+          setMessage("Seu processo foi inválido, reescreva o campo 'experiência profissional' ou tente novamente mais tarde. ");
+        setMessageType("error");
         }
       }, 5000);
       

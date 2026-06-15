@@ -30,7 +30,8 @@ def register(
                            experience=experience,
                            resume_path = text["filepath"],
                            resume_filename=text["filename"],
-                           ai_analysis="")
+                           ai_analysis="",
+                           interview="")
     db.add(candidate)
     db.commit()
     db.refresh(candidate)
@@ -55,7 +56,7 @@ def get_status(
         return {"status":"not_found"}
     if not candidate.ai_analysis:
         return {"status":"processing"} 
-
+    
     return{
         "status":"completed",
         "analysis":candidate.ai_analysis

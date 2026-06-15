@@ -139,7 +139,7 @@ export default function Chatbot(props: { text: string; }) {
       </div>
 
       <div className="flex-1 overflow-hidden rounded-[28px] border border-zinc-800 bg-black p-4">
-        <div className="flex h-full flex-col gap-4 overflow-y-auto pr-2">
+        <div className="flex flex-col gap-4 overflow-y-auto pr-2 max-h-[40vh]">
           {messages.map((message) => (
             <ChatMessage key={message.id} role={message.role} text={message.text} />
           ))}

@@ -23,6 +23,7 @@ class Candidate(Base):
     resume_path= Column(String, nullable=False)
     resume_filename = Column(String)
     ai_analysis = Column(Text)
+    interview = Column(Text)
 
 class User(Base):
     __tablename__="users"
