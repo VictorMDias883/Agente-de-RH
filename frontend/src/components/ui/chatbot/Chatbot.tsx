@@ -56,7 +56,8 @@ export default function Chatbot(props: { text: string; }) {
     event.preventDefault();
     const text = inputValue.trim();
     if (!text) return;
-
+    const token = "bearer "+localStorage.getItem("authToken");
+    
     const userMessage: Message = {
       id: buildMessageId(),
       role: "user",
@@ -73,6 +74,7 @@ export default function Chatbot(props: { text: string; }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "authorization":token
         },
         body: JSON.stringify({ message: text }),
         signal: AbortSignal.timeout(30000), // Timeout de 30 segundos

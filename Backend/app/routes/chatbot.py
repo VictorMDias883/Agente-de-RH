@@ -1,30 +1,18 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.schemas.chatbot import ChatBot
-from app.IaConn.chatbot import Chat
+from app.services.chatbot import chatService
+from app.core.security import get_current_user
+from sqlalchemy.orm import Session
+from app.databaseConn.connection import get_db
+from app.models.models import User
 router = APIRouter(
     prefix="/chat",
     tags=["Chatbot"]
 )
-messages = []
-index=0
+
 @router.post("/message")
-def sendMessage(message: ChatBot):
-    global index
-    
-    
-    objMes = {
-        "index": index,
-        "role": "user",
-        "content": message.message  
-    }
-    messages.append(objMes)
-    index+=1
-    resposta = Chat.responder(messages)
-    if resposta.strip().startswith("ENTREVISTA_FINALIZADA"):
-        resposta = resposta.replace("ENTREVISTA_FINALIZADA", "")
-        resposta = resposta.strip()
-        print(resposta)
-        return {"message": "Essa entrevista foi finalizada, aguarde o email para a convocação para a entrevista final"}
-    return {"message": resposta}
+def sendMessage(
+    message: ChatBot, current_user:User = Depends(get_current_user), db:Session = Depends(get_db)):
+   return chatService.message(message, current_user, db)
     
     

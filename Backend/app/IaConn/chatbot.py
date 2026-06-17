@@ -71,8 +71,7 @@ class Chat:
                     {
                     "status": "valido" ou "invalido",
                     "resumo": "resumo profissional curto baseado na entrevista completa",
-                    "motivo_invalidacao": "motivo da inconsistência ou null",
-                    "pergunta": null
+                    "motivo_invalidacao": "motivo da inconsistência ou null"
                     }
                     
                     Importante:
