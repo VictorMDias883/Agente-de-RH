@@ -32,12 +32,13 @@ class chatService:
         )
         messages =  [ json.loads(m)
                      for m in messages ]
-        resposta = Chat.responder(messages)
+        if(index==10):
+            resposta = Chat.responder(messages, candidate.ai_analysis)
+        resposta = Chat.responder(messages, "")
         
-        # Incrementa para a resposta
-        resp_index = r.incr(index_key) - 1
+        
         Iamessage={
-            "index": resp_index,
+            "index": index,
             "role":"assistant",
             "content":resposta
         }
@@ -54,7 +55,8 @@ class chatService:
             messages =  [ json.loads(m)
                      for m in messages ]
             
-           
+            resposta = resposta.replace("ENTREVISTA_FINALIZADA", "")
+            candidate.ai_analysis = resposta
             candidate.interview = json.dumps(messages)
             db.add(candidate)
             db.commit()
@@ -64,7 +66,7 @@ class chatService:
             r.delete(candidate_key)
             r.delete(index_key)
             
-            resposta = resposta.replace("ENTREVISTA_FINALIZADA", "")
+            
             resposta = resposta.strip()
             print(resposta)
             return {"message": "Essa entrevista foi finalizada, aguarde o email para a convocação para a entrevista final"}

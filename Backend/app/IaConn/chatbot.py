@@ -6,7 +6,7 @@ load_dotenv()
 class Chat:
     
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    def responder(messages:str):
+    def responder(messages:str, analysis:str):
         response = Chat.client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
@@ -59,11 +59,13 @@ class Chat:
                     Quando a décima pergunta já tiver sido feita e respondida:
                     
                     1. Analise toda a entrevista.
-                    2. Gere um resumo profissional curto do candidato.
-                    3. Determine se o candidato é válido ou inválido.
-                    4. Caso inválido, informe o motivo.
-                    5. Não faça novas perguntas.
-                    
+                    2. Você receberá também uma análise do currículo.
+                    3. Combine essa análise com a entrevista para gerar um resumo completo.
+                    4. Determine se o candidato é válido ou inválido.
+                    5. Caso inválido, informe o motivo.
+                    6. Não faça novas perguntas.
+                    7. Combine as mensagens junto com o resumo do curriculo e gere um resumo melhor
+                    {analysis}
                     Retorne exatamente neste formato:
                     
                     ENTREVISTA_FINALIZADA
@@ -81,7 +83,7 @@ class Chat:
                     * o campo motivo_invalidacao deve ser null quando o candidato for válido
                     * após ENTREVISTA_FINALIZADA não deve existir nenhuma pergunta adicional
                     * retorne exatamente o formato especificado
-
+                    
                 """
                 },
                     {

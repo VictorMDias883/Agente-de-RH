@@ -58,6 +58,7 @@ class Request:
                     {
                         "status": "valido" ou "invalido",
                         "resumo": "resumo profissional curto",
+                        "links": "links uteis de contato",
                         "motivo_invalidacao": "motivo da inconsistência ou null",
                         "pergunta": "pergunta gerada para entrevista ou null"
                     }
