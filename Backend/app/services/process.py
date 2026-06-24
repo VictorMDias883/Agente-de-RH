@@ -36,7 +36,7 @@ class ProcessService:
             candidate = db.query(Candidate).filter(
                 Candidate.id == candidate_id
             ).first()
-            print(resumo_str)
+            
             if candidate:
                 candidate.ai_analysis = resumo_str
                 db.commit()
