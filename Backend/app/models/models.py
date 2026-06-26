@@ -3,12 +3,6 @@ from sqlalchemy.orm import relationship
 from ..databaseConn.connection import Base
 from enum import Enum
 from sqlalchemy  import Enum as SqlEnum
-
-class ProcessosEnum(str, Enum):
-    primeiroEstagio= "Em Recrutamento"
-    segundoEstagio = "Analise de curriculo"
-    terceiroEstagio = "Entrevista"
-    quartoEstagio = "Esperando Contratação"
 class Candidate(Base):
     __tablename__ = "candidatos"
 
@@ -20,6 +14,7 @@ class Candidate(Base):
     candidate = relationship("User")
     phone = Column(String)
     experience = Column(Text)
+    vaga = relationship("Vagas")
     resume_path= Column(String, nullable=False)
     resume_filename = Column(String)
     ai_analysis = Column(Text)
@@ -40,10 +35,9 @@ class Admin(Base):
     email = Column(String, unique=True, nullable=True)
     hashed_password = Column(String, nullable=False)
 
-class Processos(Base):
-    __tablename__= "processos"
+class Vagas(Base):
+    __tablename__="vagas"
     id=Column(Integer, primary_key=True, index=True)
-    name = Column(SqlEnum(ProcessosEnum), nullable=False)
-    status = Column(String, nullable=False)
-    
-    filepath=Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    espec = Column(String, nullable=False)
+    quantity = Column(Integer, nullable=False)

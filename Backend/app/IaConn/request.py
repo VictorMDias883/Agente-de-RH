@@ -1,5 +1,6 @@
 import os
 import json
+from app.models.models import Vagas
 from dotenv import load_dotenv
 from groq import AsyncGroq
 load_dotenv()
@@ -7,7 +8,7 @@ class Request:
     
     client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
     @staticmethod
-    async def gerar_resumo(experiencia:str, curriculo:str):
+    async def gerar_resumo(experiencia:str, curriculo:str, vaga:Vagas):
 
         response = await Request.client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -24,7 +25,11 @@ class Request:
                     1. Criar um resumo profissional curto do candidato.
                     2. Identificar inconsistências, exageros, contradições ou informações suspeitas.
                     3. Gerar uma pergunta técnica ou comportamental baseada no perfil analisado.
-                
+                    * tudo isso baseado nessa vaga:
+                    {
+                    nome:{vaga.name},
+                    especificações: {vaga.espec}
+                    }
                     Antes de gerar qualquer resultado, valide a qualidade das informações recebidas.
                 
                     Considere INVÁLIDO quando ocorrer qualquer uma das situações:

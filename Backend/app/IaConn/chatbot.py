@@ -1,12 +1,12 @@
 import os
-
+from app.models.models import Vagas
 from dotenv import load_dotenv
 from groq import Groq
 load_dotenv()
 class Chat:
     
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    def responder(messages:str):
+    def responder(messages:str, vaga:Vagas):
         response = Chat.client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
@@ -30,7 +30,11 @@ class Chat:
                     * manter contexto da conversa
                     * aprofundar quando necessário
                     * avaliar experiência, conhecimento técnico, comunicação e perfil profissional
-                    
+                    * toda avaliação deve ser baseado nos dados dessa vaga:
+                    {
+                    nome: {vaga.name},
+                    especificações: {vaga.espec}
+                    }
                     Regras:
                     
                     * a entrevista possui exatamente 10 perguntas

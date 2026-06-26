@@ -19,6 +19,7 @@ def register(
     background_tasks:BackgroundTasks,
     phone: str = Form(...),
     experience: str = Form(...),
+    vaga: str = Form(""),
     curriculum: UploadFile=File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -28,6 +29,7 @@ def register(
     candidate = Candidate(candidateId=current_user.id,
                            phone = phone,
                            experience=experience,
+                           vaga=vaga,
                            resume_path = text["filepath"],
                            resume_filename=text["filename"],
                            ai_analysis="",

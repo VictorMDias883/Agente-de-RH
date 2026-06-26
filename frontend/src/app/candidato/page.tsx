@@ -4,7 +4,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UploadCloud, Bot, CheckCircle2, AlertCircle, Loader2, File as FileIcon } from "lucide-react";
 import Chatbot from "../../components/ui/chatbot/Chatbot";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
+type VagaOption = {
+  id?: number;
+  name: string;
+  espec: string;
+  quantity: number;
+};
+
 export default function CandidatePage() {
   const router = useRouter();
   
@@ -17,6 +26,9 @@ export default function CandidatePage() {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [Analysis, setAn] = useState("");
+  const [vagas, setVagas] = useState<VagaOption[]>([]);
+  const [selectedVaga, setSelectedVaga] = useState("");
+  const [loadingVagas, setLoadingVagas] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken")
@@ -30,18 +42,53 @@ export default function CandidatePage() {
     setToken(storedToken);
     setAuthorized(true);
   }, [router]);
+
+  useEffect(() => {
+    async function loadVagas() {
+      setLoadingVagas(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/vagas/list`);
+        if (!response.ok) throw new Error("Não foi possível carregar as vagas.");
+
+        const data = await response.json();
+        const availableVagas = Array.isArray(data) ? data : [];
+        setVagas(availableVagas);
+
+        if (availableVagas.length > 0) {
+          setSelectedVaga(availableVagas[0].name);
+        }
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : "Erro ao carregar vagas.");
+        setMessageType("error");
+      } finally {
+        setLoadingVagas(false);
+      }
+    }
+
+    if (authorized) {
+      loadVagas();
+    }
+  }, [authorized]);
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>){
     event.preventDefault();
     if (!file) {
-    setMessage("Envie um currículo");
-    setMessageType("error");
-    return;
-  }
+      setMessage("Envie um currículo");
+      setMessageType("error");
+      return;
+    }
+
+    if (!selectedVaga) {
+      setMessage("Selecione uma vaga antes de enviar a candidatura.");
+      setMessageType("error");
+      return;
+    }
+
     setIsLoading(true);
     setMessage(null);
     const formData = new FormData();
     formData.append("phone", phone)
     formData.append("experience", experience)
+    formData.append("vaga", selectedVaga)
     formData.append("curriculum", file)
     const endpoint = `${API_BASE_URL}/${"process"}/register`;
     try{
@@ -67,6 +114,7 @@ export default function CandidatePage() {
         setFile(null);
         setPhone("");
         setExp("");
+        setSelectedVaga(vagas[0]?.name || "");
         setMessage(null);
         setMessageType(null);
       }, 2000);
@@ -125,6 +173,33 @@ export default function CandidatePage() {
 
           {/* FORM */}
           <form className="space-y-8" onSubmit={handleSubmit}>
+            {/* VACANCY */}
+            <div>
+              <label className="block text-sm text-zinc-400 mb-3">
+                Vaga desejada
+              </label>
+
+              {loadingVagas ? (
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <Loader2 size={16} className="animate-spin" />
+                  Carregando vagas...
+                </div>
+              ) : (
+                <select
+                  value={selectedVaga}
+                  onChange={(event) => setSelectedVaga(event.target.value)}
+                  className="w-full bg-black border border-zinc-800 rounded-2xl px-5 py-4 outline-none focus:border-white transition"
+                >
+                  <option value="">Selecione uma vaga</option>
+                  {vagas.map((vaga) => (
+                    <option key={vaga.id ?? vaga.name} value={vaga.name}>
+                      {vaga.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
             {/* PHONE */}
             <div>
               <label className="block text-sm text-zinc-400 mb-3">

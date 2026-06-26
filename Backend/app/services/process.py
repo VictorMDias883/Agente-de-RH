@@ -33,12 +33,13 @@ class ProcessService:
             invasive=messsageDetection(experience)
             if(invasive):
                 return
-            resumo_str = asyncio.run(Request.gerar_resumo(experience, text))
-            
-            
             candidate = db.query(Candidate).filter(
                 Candidate.id == candidate_id
             ).first()
+            resumo_str = asyncio.run(Request.gerar_resumo(experience, text, candidate.vaga))
+            
+            
+            
             
             if candidate:
                 candidate.ai_analysis = resumo_str

@@ -1,12 +1,12 @@
 import os
-
+from app.models.models import Vagas
 from dotenv import load_dotenv
 from groq import Groq
 load_dotenv()
 class Resumer:
     
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-    def responder(interview:str, analysis:str):
+    def responder(interview:str, analysis:str, vaga:Vagas):
         response = Resumer.client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
@@ -34,7 +34,11 @@ class Resumer:
                     * gerar um resumo profissional completo e objetivo
                     * validar se o candidato é válido ou inválido
                     * justificar a invalidação se necessário
-                    
+                    * tudo isso baseado nessa vaga:
+                    {
+                    nome:{vaga.name},
+                    especificações: {vaga.espec}
+                    }
                     Regras:
                     
                     * combine a análise do currículo com as respostas da entrevista
