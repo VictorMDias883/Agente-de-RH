@@ -3,7 +3,7 @@ from fastapi import Depends
 from app.IaConn.chatbot import Chat
 from app.IaConn.resumer import Resumer
 from app.models.models import Candidate
-
+from app.IaConn.security.guardrail import messsageDetection
 from app.databaseConn.cacheConn import redis_client as r
 import json
 class chatService:
@@ -15,7 +15,9 @@ class chatService:
             raise Exception("Candidate not found")
         candidate_key= f"candidate:{candidate.candidateId}:messages"
         index_key = f"candidate:{candidate.candidateId}:index"
-    
+        invasive = messsageDetection(message.message)
+        if invasive:
+            return {"message":"mensagem invasiva detectada, candidato sendo eliminado"}
         index = r.incr(index_key) - 1
         objMes = {
             "index": index,
@@ -34,7 +36,7 @@ class chatService:
         messages =  [ json.loads(m)
                      for m in messages ]
         print(index)
-        if(index==2):
+        if(index==10):
             resposta = Resumer.responder(messages, candidate.ai_analysis)
             print(candidate.ai_analysis)
             candidate.ai_analysis = resposta

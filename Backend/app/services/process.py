@@ -3,6 +3,7 @@ import uuid
 import asyncio
 from app.databaseConn.connection import SessionLocal
 from app.IaConn.request import Request
+from app.IaConn.security.guardrail import messsageDetection
 from app.models.models import Candidate
 from fastapi import File
 from pypdf import PdfReader
@@ -29,7 +30,9 @@ class ProcessService:
     ):
         db = SessionLocal()
         try:
-            
+            invasive=messsageDetection(experience)
+            if(invasive):
+                return
             resumo_str = asyncio.run(Request.gerar_resumo(experience, text))
             
             
