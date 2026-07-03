@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.security import get_current_admin
 from app.databaseConn.connection import get_db
+from app.models.models import Admin
 from app.schemas.admin import (
     AdminRegister,
     AdminLogin
@@ -28,3 +30,12 @@ def login(
     db: Session = Depends(get_db)
 ):
     return AdminService.adminLogin(user, db)
+
+@router.get("/me")
+def get_me(
+    current_admin: Admin = Depends(get_current_admin)
+):
+    return {
+        "message": "Admin access granted",
+        "admin_email": current_admin.email
+    }

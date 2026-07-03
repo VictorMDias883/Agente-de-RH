@@ -1,5 +1,5 @@
 from fastapi import Form, File, UploadFile, APIRouter, Depends, BackgroundTasks
-from app.models.models import User, Candidate
+from app.models.models import User, Candidate, Vagas
 
 from app.core.security import oauth2_scheme, get_current_user
 from sqlalchemy.orm import Session
@@ -19,17 +19,18 @@ def register(
     background_tasks:BackgroundTasks,
     phone: str = Form(...),
     experience: str = Form(...),
-    vaga: str = Form(""),
+    vaga: str = Form(...),
     curriculum: UploadFile=File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     
     text = ProcessService.saveCurriculumAndResume(curriculum)
+    vaga_obj = db.query(Vagas).filter(Vagas.name==vaga).first()
     candidate = Candidate(candidateId=current_user.id,
                            phone = phone,
                            experience=experience,
-                           vaga=vaga,
+                           vaga=vaga_obj,
                            resume_path = text["filepath"],
                            resume_filename=text["filename"],
                            ai_analysis="",

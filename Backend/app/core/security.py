@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from app.models.models import User
+from app.models.models import User, Admin
 from app.databaseConn.connection import get_db
 from app.core.config import (
     SECRET_KEY,
@@ -80,3 +80,37 @@ def get_current_user(token:str = Depends(oauth2_scheme), db:Session =  Depends(g
                 status_code=401,
                 detail="invalid Token"
             )
+
+
+def get_current_admin(token:str = Depends(oauth2_scheme), db:Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+        email = payload.get("sub")
+        is_admin = payload.get("is_admin")
+
+        if not email or is_admin is not True:
+            raise HTTPException(
+                status_code=401,
+                detail="Admin access required"
+            )
+
+        admin = db.query(Admin).filter(
+            Admin.email == email
+        ).first()
+
+        if not admin:
+            raise HTTPException(
+                status_code=401,
+                detail="Admin not found"
+            )
+
+        return admin
+    except JWTError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )

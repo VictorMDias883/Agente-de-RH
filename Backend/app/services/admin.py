@@ -62,7 +62,8 @@ class AdminService:
 
         access_token = create_access_token(
             data={
-            "sub": db_user.email
+                "sub": db_user.email,
+                "is_admin": True
             }
         )
 

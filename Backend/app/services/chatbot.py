@@ -13,6 +13,7 @@ class chatService:
         ).first()
         if not candidate: 
             raise Exception("Candidate not found")
+        print(candidate.vaga)
         candidate_key= f"candidate:{candidate.candidateId}:messages"
         index_key = f"candidate:{candidate.candidateId}:index"
         invasive = messsageDetection(message.message)
@@ -37,7 +38,7 @@ class chatService:
                      for m in messages ]
         print(index)
         if(index==10):
-            resposta = Resumer.responder(messages, candidate.ai_analysis)
+            resposta = Resumer.responder(messages, candidate.ai_analysis, candidate.vaga)
             print(candidate.ai_analysis)
             candidate.ai_analysis = resposta
             candidate.interview = json.dumps(messages)
@@ -63,7 +64,7 @@ class chatService:
             resposta = resposta.strip()
             return {"message": "Essa entrevista foi finalizada, aguarde o email para a convocação para a entrevista final"}
         else:
-            resposta = Chat.responder(messages)
+            resposta = Chat.responder(messages, candidate.vaga)
         
         
         Iamessage={
