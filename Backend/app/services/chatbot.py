@@ -2,7 +2,7 @@ from fastapi import Depends
 
 from app.IaConn.chatbot import Chat
 from app.IaConn.resumer import Resumer
-from app.models.models import Candidate
+from app.models.models import Candidate, User
 from app.IaConn.security.guardrail import messsageDetection
 from app.databaseConn.cacheConn import redis_client as r
 import json
@@ -39,11 +39,9 @@ class chatService:
         print(index)
         if(index==10):
             resposta = Resumer.responder(messages, candidate.ai_analysis, candidate.vaga)
-            print(candidate.ai_analysis)
+            
             candidate.ai_analysis = resposta
             candidate.interview = json.dumps(messages)
-            print(resposta)
-            print(messages)
             try:
                 db.add(candidate)
                 db.commit()
@@ -57,6 +55,16 @@ class chatService:
                 0,
                 -1
             )
+            try:
+                user = db.query(User).filter( candidate.candidateId == User.id)
+                user.applied = True
+                db.add(user)
+                db.commit()
+                db.refresh(user)
+            except Exception as e:
+                db.rollback()
+                print("ERRO AO SALVAR NO BANCO:Usuário", e)
+                raise
             messages =  [ json.loads(m)
                      for m in messages ]  
             r.delete(candidate_key)

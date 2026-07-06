@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from ..databaseConn.connection import Base
 from enum import Enum
@@ -26,9 +26,9 @@ class User(Base):
 
     id=Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    email = Column(String, unique=True, nullable=True)
+    email = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-
+    applied = Column(Boolean, nullable=True)
 class Admin(Base):
     __tablename__="admins"
     id=Column(Integer, primary_key=True, index=True)

@@ -81,7 +81,7 @@ class Resumer:
                     "pontos_fortes": "principais pontos fortes identificados",
                     "pontos_fracos": "principais pontos fracos identificados",
                     "motivo_invalidacao": "motivo da inconsistência ou null se válido",
-                    "links": "links uteis de contato contidos nos resumos"
+                    "links": "links uteis de contato contida na analíse do curriculo, caso não haja, escreva "curriculo não detectado""
                     }}
                     
                     Importante:
